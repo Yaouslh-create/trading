@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+logs/demo_trades.json
+logs/performance.json
+logs/errors.json
+reporting/outputs/*.json
+data/cache/
+*.zip
