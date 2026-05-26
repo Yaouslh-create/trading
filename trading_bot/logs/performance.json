@@ -1,0 +1,48 @@
+{
+  "metriques_actuelles": {
+    "nb_trades": 0,
+    "win_rate": 0,
+    "profit_factor": 0,
+    "sharpe": 0,
+    "sortino": 0,
+    "calmar": 0,
+    "gain_moyen": 0,
+    "perte_moyenne": 0,
+    "pnl_total": 0,
+    "rendement_pct": 0.0,
+    "max_drawdown": 0,
+    "max_serie_perdante": 0,
+    "esperance": 0
+  },
+  "courbe_capital": [
+    100.0,
+    100.0
+  ],
+  "snapshots": [
+    {
+      "nb_trades": 0,
+      "win_rate": 0,
+      "profit_factor": 0,
+      "sharpe": 0,
+      "sortino": 0,
+      "calmar": 0,
+      "gain_moyen": 0,
+      "perte_moyenne": 0,
+      "pnl_total": 0,
+      "rendement_pct": 0.0,
+      "max_drawdown": 0,
+      "max_serie_perdante": 0,
+      "esperance": 0,
+      "capital_actuel": 100.0,
+      "capital_initial": 100.0,
+      "capital_max": 100.0,
+      "perte_journaliere": 0.0,
+      "trading_autorise": true,
+      "raison_blocage": "",
+      "drawdown_pct": 0.0,
+      "nb_positions": 0,
+      "timestamp": "2026-05-25T18:44:59.965084"
+    }
+  ],
+  "derniere_maj": "2026-05-25T18:44:59.965184"
+}

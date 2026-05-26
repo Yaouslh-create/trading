@@ -1,0 +1,63 @@
+{
+  "session": {
+    "debut": "2026-05-25T18:44:29.959561",
+    "fin": "2026-05-25T18:45:24.695031",
+    "duree_s": 55.0
+  },
+  "performance": {
+    "capital_initial": 100.0,
+    "capital_final": 100.0,
+    "rendement_pct": 0.0,
+    "nb_trades": 0,
+    "drawdown_max": 0.0
+  },
+  "systeme": {
+    "erreurs_par_agent": {
+      "ErrorSentinel": 1
+    },
+    "agents": {
+      "HalalScreener": {
+        "status": "STOPPED",
+        "info": "",
+        "last_seen": "2026-05-25T18:45:24.694737",
+        "ts": 1779734724.69474
+      },
+      "DataCollector": {
+        "status": "STOPPED",
+        "info": "",
+        "last_seen": "2026-05-25T18:45:24.694516",
+        "ts": 1779734724.694519
+      },
+      "RiskGuardian": {
+        "status": "STOPPED",
+        "info": "",
+        "last_seen": "2026-05-25T18:45:24.694379",
+        "ts": 1779734724.6943948
+      },
+      "SignalGenerator": {
+        "status": "STOPPED",
+        "info": "",
+        "last_seen": "2026-05-25T18:45:24.687110",
+        "ts": 1779734724.6871133
+      },
+      "TradeExecutor": {
+        "status": "STOPPED",
+        "info": "",
+        "last_seen": "2026-05-25T18:45:24.687009",
+        "ts": 1779734724.687011
+      },
+      "PerformanceTracker": {
+        "status": "STOPPED",
+        "info": "",
+        "last_seen": "2026-05-25T18:45:24.686943",
+        "ts": 1779734724.6869454
+      },
+      "ErrorSentinel": {
+        "status": "STOPPED",
+        "info": "",
+        "last_seen": "2026-05-25T18:45:24.686767",
+        "ts": 1779734724.6867893
+      }
+    }
+  }
+}
