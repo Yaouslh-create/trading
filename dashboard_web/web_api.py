@@ -283,6 +283,10 @@ def bg_loop():
             log("Système démarré — 11 agents opérationnels", "ok")
         time.sleep(30)
 
+# Init synchrone
+gen_prix_base()
+_s=gen_signals()
+_signals.update(_s)
 threading.Thread(target=bg_loop, daemon=True).start()
 
 # ─── API Routes ────────────────────────────────────────────────────────────
