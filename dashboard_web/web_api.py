@@ -340,9 +340,43 @@ def health():
 
 @app.route("/")
 def dashboard():
-    import json
+    import json as _json
+    # Forcer la génération des données si vide
+    if not _prix:
+        gen_prix_base()
+    sigs = gen_signals()
     with _lock:
-        prix_json = json.dumps(dict(_prix))
+        _signals.update(sigs)
+        p = dict(_prix)
+        s = dict(_signals)
+        pos = dict(_positions)
+        tr = _trades[:20]
+        lg = _logs[:40]
+        cap = round(_capital, 2)
+        rend = round((_capital - 100) / 100 * 100, 2)
+        dd = round((_cap_max - _capital) / _cap_max * 100 if _cap_max > 0 else 0, 2)
+    
+    status = {
+        "capital": cap, "rendement": rend, "drawdown": dd,
+        "nb_signals": len(s), "nb_positions": len(pos),
+        "nb_trades": len(tr), "win_rate": 0, "trading_ok": True
+    }
+    
+    # Injecter dans le HTML - remplace les tableaux vides par des vrais
+    html = HTML
+    data_script = f"""<script>
+// Données pré-calculées côté serveur
+window._INIT = {{
+  prix: {_json.dumps(p)},
+  signals: {_json.dumps(s)},
+  positions: {_json.dumps(pos)},
+  history_: {_json.dumps(tr)},
+  logs: {_json.dumps(lg)},
+  status: {_json.dumps(status)}
+}};
+</script>"""
+    html = html.replace("</head>", data_script + "</head>")
+    return html
         signals_json = json.dumps(dict(_signals))
         positions_json = json.dumps(dict(_positions))
         trades_json = json.dumps(_trades[:20])
@@ -1398,6 +1432,42 @@ async function tick(){
 }
 
 // INITIAL_DATA_PLACEHOLDER
+
+// Initialisation depuis données serveur
+if(window._INIT) {
+  const d = window._INIT;
+  if(d.prix && Object.keys(d.prix).length > 0) {
+    state.prix = d.prix;
+    // Init historiques depuis prix
+    Object.entries(d.prix).forEach(([sym,px]) => {
+      if(!_localHistories[sym]) _localHistories[sym] = [];
+      const info = REFS[sym];
+      if(info && _localHistories[sym].length < 60) {
+        let p = info.ref;
+        for(let i=0;i<59;i++){
+          p = p*(1+((_seededRand(sym,i-200))*info.vol));
+          _localHistories[sym].push(+p.toFixed(4));
+        }
+        _localHistories[sym].push(px.px||px);
+      }
+    });
+  }
+  if(d.signals && Object.keys(d.signals).length > 0) state.signals = d.signals;
+  if(d.positions) state.positions = d.positions;
+  if(d.history_) state.history_ = d.history_;
+  if(d.logs && d.logs.length > 0) state.logs = d.logs;
+  if(d.status) {
+    state.capital = d.status.capital;
+    state.rendement = d.status.rendement;
+    state.drawdown = d.status.drawdown;
+    state.nbSignals = d.status.nb_signals;
+    state.nbPositions = d.status.nb_positions;
+    state.nbTrades = d.status.nb_trades;
+    state.tradingOk = d.status.trading_ok;
+  }
+  console.log("✅ Init serveur:", Object.keys(state.prix).length, "actifs,", Object.keys(state.signals).length, "signaux");
+  renderAll();
+}
 
 // Démarrage
 tick();
