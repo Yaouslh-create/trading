@@ -1,7 +1,1 @@
-TRADING BOT HALAL - VERSION
-============================
-Build: 2026-05-26 13:31:21
-Agents: 11 (8 principaux + 3 vérification)
-Start: python cloud/start_cloud.py
-Port: 10000
-Status: DEPLOYING
+v20260527_082031 - 11 agents halal - start_render.py
