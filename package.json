@@ -1,7 +1,7 @@
 {
-  "name": "halal-trading-bot",
-  "version": "1.0.0",
-  "description": "Halal Trading Bot Pro Dashboard with Live Trading Data",
+  "name": "halal-trading-bot-pro",
+  "version": "2.0.0",
+  "description": "Professional Halal Trading Bot Dashboard with AI Agents & Real-Time Analytics",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -11,7 +11,10 @@
     "trading",
     "bot",
     "halal",
-    "cryptocurrency"
+    "cryptocurrency",
+    "dashboard",
+    "ai",
+    "agents"
   ],
   "author": "Yaouslh",
   "license": "MIT",

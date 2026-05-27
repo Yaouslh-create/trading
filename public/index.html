@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Halal Trading Bot Pro - Dashboard Avancé</title>
+  <title>Halal Trading Bot Pro - Dashboard Professionnel</title>
   <script src="https://s3.tradingview.com/tv.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -22,65 +23,155 @@
       overflow: hidden;
     }
 
-    /* ===== SIDEBAR ===== */
-    .sidebar {
-      width: 280px;
-      background: linear-gradient(180deg, #111827 0%, #0f1419 100%);
-      padding: 20px;
+    /* ===== NAVIGATION ===== */
+    .nav-bar {
+      width: 100%;
+      height: 50px;
+      background: linear-gradient(90deg, #111827 0%, #1f2937 100%);
+      border-bottom: 2px solid #10b981;
       display: flex;
-      flex-direction: column;
-      gap: 15px;
-      border-right: 1px solid #1f2937;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
-      overflow-y: auto;
+      align-items: center;
+      padding: 0 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
-    .sidebar h2 {
-      font-size: 20px;
-      margin-bottom: 10px;
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    .nav-bar h1 {
+      font-size: 22px;
+      background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      margin-right: auto;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .section {
+    .nav-tabs {
+      display: flex;
+      gap: 0;
+    }
+
+    .nav-tab {
+      padding: 14px 18px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.3s ease;
+      border-bottom: 3px solid transparent;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-tab:hover {
+      color: #10b981;
+    }
+
+    .nav-tab.active {
+      color: #10b981;
+      border-bottom-color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: 20px;
+      padding: 6px 12px;
+      background: rgba(16, 185, 129, 0.1);
+      border-radius: 20px;
+      border: 1px solid #10b981;
+      font-size: 12px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* ===== MAIN CONTAINER ===== */
+    .container {
+      display: flex;
+      width: 100%;
+      height: calc(100vh - 50px);
+      margin-top: 50px;
+      overflow: hidden;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(180deg, #111827 0%, #0f1419 100%);
+      padding: 20px;
+      border-right: 1px solid #1f2937;
+      overflow-y: auto;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .sidebar h3 {
+      font-size: 16px;
+      margin-bottom: 15px;
+      color: #10b981;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 2px solid #10b981;
+      padding-bottom: 10px;
+    }
+
+    .control-section {
+      margin-bottom: 20px;
       background: #1f2937;
       padding: 12px;
       border-radius: 8px;
       border-left: 3px solid #10b981;
     }
 
-    .section-title {
-      font-size: 12px;
+    .control-section-title {
+      font-size: 11px;
       font-weight: bold;
-      text-transform: uppercase;
       color: #10b981;
-      margin-bottom: 10px;
-      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
     }
 
     .btn {
-      padding: 12px;
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 8px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
       background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
       color: white;
       font-weight: 600;
+      font-size: 12px;
       transition: all 0.3s ease;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      font-size: 13px;
+      gap: 6px;
       border: 1px solid #4b5563;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .btn:hover {
-      background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
     }
@@ -113,436 +204,954 @@
       border: 1px solid #f59e0b;
     }
 
-    /* ===== MAIN CONTENT ===== */
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
+    .input-group {
+      margin-bottom: 10px;
     }
 
-    header {
-      background: linear-gradient(90deg, #111827 0%, #1f2937 100%);
-      padding: 20px;
-      font-size: 24px;
-      font-weight: bold;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #1f2937;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    .input-group label {
+      display: block;
+      font-size: 11px;
+      color: #9ca3af;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
     }
 
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #1f2937;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 13px;
+    .input-group input, .input-group select {
+      width: 100%;
+      padding: 8px;
+      background: #111827;
       border: 1px solid #374151;
+      border-radius: 4px;
+      color: white;
+      font-size: 12px;
     }
 
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #10b981;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 2.5fr 1fr;
-      gap: 15px;
-      padding: 15px;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    .card {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      border-radius: 12px;
-      padding: 15px;
-      overflow: hidden;
-      border: 1px solid #1f2937;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .card h3 {
-      font-size: 16px;
-      margin-bottom: 12px;
-      color: #10b981;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    #tradingview_widget {
-      flex: 1;
-      min-height: 400px;
-    }
-
-    /* ===== PORTFOLIO SECTION ===== */
-    .portfolio-item {
+    .stats-box {
       background: #111827;
       padding: 12px;
       border-radius: 8px;
+      border-left: 3px solid #3b82f6;
       margin-bottom: 10px;
-      border-left: 3px solid #10b981;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
 
-    .portfolio-label {
-      font-size: 12px;
-      text-transform: uppercase;
+    .stats-box-label {
+      font-size: 10px;
       color: #9ca3af;
+      text-transform: uppercase;
       margin-bottom: 4px;
     }
 
-    .portfolio-value {
-      font-size: 20px;
+    .stats-box-value {
+      font-size: 18px;
       font-weight: bold;
       color: #10b981;
     }
 
-    .portfolio-value.negative {
-      color: #ef4444;
+    /* ===== MAIN CONTENT ===== */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
-    .stats-grid {
+    .tabs-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* ===== GRID LAYOUTS ===== */
+    .grid-2col {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 15px;
+      gap: 15px;
     }
 
-    .stat-box {
+    .grid-3col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .grid-full {
+      grid-column: 1 / -1;
+    }
+
+    /* ===== CARDS ===== */
+    .card {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #1f2937;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .card h4 {
+      font-size: 14px;
+      color: #10b981;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #10b981;
+      padding-bottom: 10px;
+    }
+
+    /* ===== TABLES ===== */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .data-table th {
       background: #111827;
       padding: 10px;
-      border-radius: 8px;
-      text-align: center;
-      border: 1px solid #1f2937;
-    }
-
-    .stat-label {
-      font-size: 11px;
-      color: #9ca3af;
-      text-transform: uppercase;
-      margin-bottom: 5px;
-    }
-
-    .stat-value {
-      font-size: 16px;
+      text-align: left;
+      color: #10b981;
       font-weight: bold;
-      color: #10b981;
+      border-bottom: 2px solid #10b981;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    /* ===== LOGS ===== */
-    .log {
-      height: 250px;
-      overflow-y: auto;
-      font-size: 11px;
-      background: #0b1220;
+    .data-table td {
       padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #1f2937;
-      font-family: 'Courier New', monospace;
-    }
-
-    .log-entry {
-      padding: 4px 0;
       border-bottom: 1px solid #1f2937;
-      color: #a1a5b4;
+      color: #e2e8f0;
     }
 
-    .log-entry.success {
+    .data-table tr:hover {
+      background: rgba(16, 185, 129, 0.05);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .badge-buy {
+      background: rgba(16, 185, 129, 0.2);
       color: #10b981;
     }
 
-    .log-entry.error {
+    .badge-sell {
+      background: rgba(239, 68, 68, 0.2);
       color: #ef4444;
     }
 
-    .log-entry.info {
+    .badge-signal {
+      background: rgba(59, 130, 246, 0.2);
       color: #3b82f6;
     }
 
-    .log::-webkit-scrollbar {
-      width: 6px;
+    .badge-strong {
+      background: rgba(16, 185, 129, 0.3);
+      color: #10b981;
+      font-weight: bold;
     }
 
-    .log::-webkit-scrollbar-track {
+    .value-positive {
+      color: #10b981;
+    }
+
+    .value-negative {
+      color: #ef4444;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-bottom: 20px;
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
       background: #0b1220;
-      border-radius: 3px;
     }
 
-    .log::-webkit-scrollbar-thumb {
+    ::-webkit-scrollbar-thumb {
       background: #374151;
-      border-radius: 3px;
+      border-radius: 4px;
     }
 
-    .log::-webkit-scrollbar-thumb:hover {
+    ::-webkit-scrollbar-thumb:hover {
       background: #4b5563;
     }
 
-    input {
-      background: #111827 !important;
-      color: white !important;
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1400px) {
+      .grid-3col {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 1200px) {
-      .grid {
+    @media (max-width: 1024px) {
+      .grid-2col, .grid-3col {
         grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        width: 250px;
       }
     }
 
     @media (max-width: 768px) {
-      body {
+      .nav-tabs {
+        flex-wrap: wrap;
+      }
+
+      .nav-tab {
+        padding: 10px 12px;
+        font-size: 11px;
+      }
+
+      .container {
         flex-direction: column;
       }
 
       .sidebar {
         width: 100%;
-        flex-direction: row;
-        overflow-x: auto;
+        max-height: 200px;
         border-right: none;
         border-bottom: 1px solid #1f2937;
-        height: auto;
       }
 
-      .section {
-        flex-shrink: 0;
-      }
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
+      .tabs-content {
+        padding: 15px;
       }
     }
-
-    .log-entry {
-      animation: slideIn 0.3s ease;
-    }
-
   </style>
 </head>
 <body>
 
-  <div class="sidebar">
-    <h2><i class="fas fa-robot"></i> Halal Bot</h2>
-    
-    <div class="section">
-      <div class="section-title">🎮 Contrôle</div>
-      <button class="btn btn-start" onclick="startBot()"><i class="fas fa-play"></i> Démarrer</button>
-      <button class="btn btn-stop" style="margin-top: 8px;" onclick="stopBot()"><i class="fas fa-stop"></i> Arrêter</button>
+  <!-- NAVIGATION BAR -->
+  <div class="nav-bar">
+    <h1><i class="fas fa-robot"></i> HALAL TRADING BOT PRO</h1>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="switchTab('marchés')"><i class="fas fa-chart-line"></i> MARCHÉS</button>
+      <button class="nav-tab" onclick="switchTab('signaux')"><i class="fas fa-bolt"></i> SIGNAUX</button>
+      <button class="nav-tab" onclick="switchTab('portefeuille')"><i class="fas fa-wallet"></i> PORTEFEUILLE</button>
+      <button class="nav-tab" onclick="switchTab('agents')"><i class="fas fa-users"></i> AGENTS</button>
+      <button class="nav-tab" onclick="switchTab('analytics')"><i class="fas fa-chart-bar"></i> ANALYTICS</button>
     </div>
-
-    <div class="section">
-      <div class="section-title">💱 Transactions</div>
-      <button class="btn btn-buy" onclick="trade('BUY')"><i class="fas fa-arrow-up"></i> Acheter</button>
-      <button class="btn btn-sell" style="margin-top: 8px;" onclick="trade('SELL')"><i class="fas fa-arrow-down"></i> Vendre</button>
-    </div>
-
-    <div class="section">
-      <div class="section-title">⚙️ Paramètres</div>
-      <label style="font-size: 12px; color: #9ca3af;">Prix Cible ($):</label>
-      <input type="number" id="priceTarget" value="150" style="width: 100%; padding: 6px; border: 1px solid #374151; border-radius: 4px; margin-top: 4px;">
-      <label style="font-size: 12px; color: #9ca3af; margin-top: 10px; display: block;">Stop Loss (%):</label>
-      <input type="number" id="stopLoss" value="5" style="width: 100%; padding: 6px; border: 1px solid #374151; border-radius: 4px; margin-top: 4px;">
-    </div>
-
-    <div class="section">
-      <div class="section-title">📊 Infos Bot</div>
-      <p style="font-size: 11px; color: #9ca3af;">État: <span id="botStatus" style="color: #10b981;">Arrêté</span></p>
-      <p style="font-size: 11px; color: #9ca3af; margin-top: 8px;">Trades: <span id="tradeCount" style="color: #3b82f6;">0</span></p>
+    <div class="status-indicator">
+      <div class="status-dot"></div>
+      <span id="status">OPÉRATIONNEL</span>
     </div>
   </div>
 
-  <div class="main">
-    <header>
-      <div><i class="fas fa-chart-line"></i> Dashboard Halal Trading Pro</div>
-      <div class="status-badge">
-        <div class="status-dot"></div>
-        <span id="status">SIMULATION EN DIRECT</span>
-      </div>
-    </header>
+  <div class="container">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <h3><i class="fas fa-cogs"></i> Contrôle</h3>
 
-    <div class="grid">
-      <div class="card">
-        <h3><i class="fas fa-candlestick-chart"></i> Graphique TradingView (Données Live)</h3>
-        <div id="tradingview_widget"></div>
+      <div class="control-section">
+        <div class="control-section-title">Bot</div>
+        <button class="btn btn-start" onclick="startBot()"><i class="fas fa-play"></i> Démarrer</button>
+        <button class="btn btn-stop" onclick="stopBot()"><i class="fas fa-stop"></i> Arrêter</button>
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 15px;">
-        <div class="card">
-          <h3><i class="fas fa-wallet"></i> Portefeuille</h3>
-          <div class="stats-grid">
-            <div class="stat-box">
-              <div class="stat-label">Solde</div>
-              <div class="stat-value" id="balance">1,000.00</div>
-              <div style="font-size: 10px; color: #9ca3af;">$</div>
+      <div class="control-section">
+        <div class="control-section-title">Trading Manual</div>
+        <button class="btn btn-buy" onclick="trade('BUY')"><i class="fas fa-arrow-up"></i> Acheter</button>
+        <button class="btn btn-sell" onclick="trade('SELL')"><i class="fas fa-arrow-down"></i> Vendre</button>
+      </div>
+
+      <div class="control-section">
+        <div class="control-section-title">Paramètres</div>
+        <div class="input-group">
+          <label>Stratégie</label>
+          <select id="strategy" onchange="changeStrategy()">
+            <option value="conservative">Conservative</option>
+            <option value="balanced" selected>Équilibré</option>
+            <option value="aggressive">Agressif</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Prix Cible ($)</label>
+          <input type="number" id="priceTarget" value="45000" min="1000" max="100000">
+        </div>
+        <div class="input-group">
+          <label>Stop Loss (%)</label>
+          <input type="number" id="stopLoss" value="2" min="0.5" max="10">
+        </div>
+        <div class="input-group">
+          <label>Take Profit (%)</label>
+          <input type="number" id="takeProfit" value="5" min="1" max="20">
+        </div>
+      </div>
+
+      <div class="control-section">
+        <div class="control-section-title">État du Système</div>
+        <div class="stats-box">
+          <div class="stats-box-label">Bot Status</div>
+          <div class="stats-box-value" id="botStatus">Arrêté</div>
+        </div>
+        <div class="stats-box">
+          <div class="stats-box-label">Trades (24h)</div>
+          <div class="stats-box-value" id="tradeCount">0</div>
+        </div>
+        <div class="stats-box">
+          <div class="stats-box-label">Win Rate</div>
+          <div class="stats-box-value" id="winRate">0%</div>
+        </div>
+        <div class="stats-box">
+          <div class="stats-box-label">ROI (24h)</div>
+          <div class="stats-box-value" id="roi24h">+0.00%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <!-- TAB: MARCHÉS -->
+      <div id="marchés" class="tab-pane active">
+        <div class="tabs-content">
+          <div class="grid-2col">
+            <div class="card grid-full">
+              <h4><i class="fas fa-candlestick-chart"></i> Graphique TradingView (BTC/USDT - 5min)</h4>
+              <div id="tradingview_widget" style="height: 500px;"></div>
             </div>
-            <div class="stat-box">
-              <div class="stat-label">Holdings</div>
-              <div class="stat-value" id="holdings">0</div>
-              <div style="font-size: 10px; color: #9ca3af;">BTC</div>
+          </div>
+          <div class="grid-3col" style="margin-top: 20px;">
+            <div class="card">
+              <h4><i class="fas fa-tag"></i> Prix Actuel</h4>
+              <div style="text-align: center; padding: 20px;">
+                <div style="font-size: 32px; color: #10b981; font-weight: bold;" id="currentPrice">$45,234</div>
+                <div style="font-size: 14px; color: #9ca3af; margin-top: 10px;" id="priceChange">+2.34% (24h)</div>
+              </div>
+            </div>
+            <div class="card">
+              <h4><i class="fas fa-fire"></i> Volume 24h</h4>
+              <div style="text-align: center; padding: 20px;">
+                <div style="font-size: 32px; color: #3b82f6; font-weight: bold;" id="volume24h">$28.5B</div>
+                <div style="font-size: 12px; color: #9ca3af; margin-top: 10px;">BTC/USDT</div>
+              </div>
+            </div>
+            <div class="card">
+              <h4><i class="fas fa-chart-pie"></i> Dominance</h4>
+              <div style="text-align: center; padding: 20px;">
+                <div style="font-size: 32px; color: #f59e0b; font-weight: bold;" id="dominance">45.2%</div>
+                <div style="font-size: 12px; color: #9ca3af; margin-top: 10px;">Marché Global</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: SIGNAUX -->
+      <div id="signaux" class="tab-pane">
+        <div class="tabs-content">
+          <div class="grid-2col">
+            <div class="card grid-full">
+              <h4><i class="fas fa-bolt"></i> Signaux de Trading en Temps Réel</h4>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Type</th>
+                    <th>Indicateur</th>
+                    <th>Signal</th>
+                    <th>Confiance</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="signalsTable">
+                  <!-- Rempli par JS -->
+                </tbody>
+              </table>
             </div>
           </div>
 
-          <div class="portfolio-item">
-            <div>
-              <div class="portfolio-label">Valeur Totale</div>
-              <div class="portfolio-value" id="totalValue">1,000.00</div>
+          <div class="grid-3col" style="margin-top: 20px;">
+            <div class="card">
+              <h4><i class="fas fa-pulse"></i> Indicateurs Techniques</h4>
+              <div style="padding: 15px;">
+                <div style="margin-bottom: 10px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>RSI (14)</span>
+                    <span style="color: #10b981;" id="rsiValue">65</span>
+                  </div>
+                  <div style="width: 100%; height: 6px; background: #111827; border-radius: 3px; overflow: hidden;">
+                    <div style="width: 65%; height: 100%; background: linear-gradient(90deg, #10b981 0%, #059669 100%);"></div>
+                  </div>
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>MACD</span>
+                    <span style="color: #10b981;" id="macdValue">Haussier</span>
+                  </div>
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Bandes Bollinger</span>
+                    <span style="color: #3b82f6;" id="bbValue">Neutral</span>
+                  </div>
+                </div>
+                <div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>EMA (20/50)</span>
+                    <span style="color: #10b981;" id="emaValue">Haussier</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div style="text-align: right;">
-              <div class="portfolio-label">Performance</div>
-              <div class="portfolio-value" id="performance">+0.00%</div>
+
+            <div class="card">
+              <h4><i class="fas fa-lightbulb"></i> Signaux Générés</h4>
+              <div style="padding: 15px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="badge badge-buy">BUY SIGNAL</span>
+                  <div style="font-size: 12px; color: #9ca3af; margin-top: 5px;">Confiance: 85%</div>
+                </div>
+                <div style="margin-bottom: 12px;">
+                  <span class="badge badge-signal">HOLD SIGNAL</span>
+                  <div style="font-size: 12px; color: #9ca3af; margin-top: 5px;">Confiance: 72%</div>
+                </div>
+                <div>
+                  <span class="badge badge-sell">SELL SIGNAL</span>
+                  <div style="font-size: 12px; color: #9ca3af; margin-top: 5px;">Confiance: 45%</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h4><i class="fas fa-star"></i> Recommandation IA</h4>
+              <div style="padding: 20px; text-align: center;">
+                <div style="font-size: 28px; color: #10b981; margin-bottom: 10px;"><i class="fas fa-thumbs-up"></i></div>
+                <div style="font-size: 16px; color: #10b981; font-weight: bold; margin-bottom: 10px;">ACHAT RECOMMANDÉ</div>
+                <div style="font-size: 12px; color: #9ca3af;">Confluence de 4 signaux haussiers</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: PORTEFEUILLE -->
+      <div id="portefeuille" class="tab-pane">
+        <div class="tabs-content">
+          <div class="grid-3col">
+            <div class="card">
+              <h4><i class="fas fa-wallet"></i> Solde Liquide</h4>
+              <div style="text-align: center; padding: 20px;">
+                <div style="font-size: 32px; color: #10b981; font-weight: bold;" id="balance">$1,000.00</div>
+                <div style="font-size: 12px; color: #9ca3af; margin-top: 10px;">USD Disponible</div>
+              </div>
+            </div>
+            <div class="card">
+              <h4><i class="fas fa-coins"></i> Holdings</h4>
+              <div style="text-align: center; padding: 20px;">
+                <div style="font-size: 32px; color: #3b82f6; font-weight: bold;" id="holdings">0</div>
+                <div style="font-size: 12px; color: #9ca3af; margin-top: 10px;">BTC Détenus</div>
+              </div>
+            </div>
+            <div class="card">
+              <h4><i class="fas fa-piggy-bank"></i> Valeur Totale</h4>
+              <div style="text-align: center; padding: 20px;">
+                <div style="font-size: 32px; color: #f59e0b; font-weight: bold;" id="totalValue">$1,000.00</div>
+                <div style="font-size: 12px; color: #9ca3af; margin-top: 10px;">Actifs Totaux</div>
+              </div>
             </div>
           </div>
 
-          <hr style="border: none; border-top: 1px solid #1f2937; margin: 10px 0;">
+          <div class="grid-2col" style="margin-top: 20px;">
+            <div class="card">
+              <h4><i class="fas fa-chart-line"></i> Performance</h4>
+              <div style="text-align: center; padding: 30px;">
+                <div style="font-size: 36px; font-weight: bold;" id="performance">
+                  <span style="color: #10b981;">+0.00%</span>
+                </div>
+                <div style="font-size: 12px; color: #9ca3af; margin-top: 10px;">Depuis l'ouverture</div>
+              </div>
+            </div>
 
-          <h3 style="margin-top: 10px;"><i class="fas fa-history"></i> Journal</h3>
-          <div class="log" id="log"></div>
+            <div class="card">
+              <h4><i class="fas fa-list"></i> Positions Actives</h4>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Symbole</th>
+                    <th>Quantité</th>
+                    <th>Prix d'Achat</th>
+                    <th>P&L</th>
+                  </tr>
+                </thead>
+                <tbody id="positionsTable">
+                  <tr><td colspan="4" style="text-align: center; color: #9ca3af; padding: 20px;">Aucune position active</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: AGENTS -->
+      <div id="agents" class="tab-pane">
+        <div class="tabs-content">
+          <div class="grid-3col">
+            <div class="card grid-full">
+              <h4><i class="fas fa-users"></i> Agents Traders Actifs</h4>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Agent ID</th>
+                    <th>Statut</th>
+                    <th>Stratégie</th>
+                    <th>Trades (24h)</th>
+                    <th>Win Rate</th>
+                    <th>P&L (24h)</th>
+                    <th>ROI</th>
+                  </tr>
+                </thead>
+                <tbody id="agentsTable">
+                  <!-- Rempli par JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="grid-3col" style="margin-top: 20px;">
+            <div class="card">
+              <h4><i class="fas fa-chart-bar"></i> Agent #1 (Conservative)</h4>
+              <div style="padding: 15px;">
+                <div style="margin-bottom: 10px;">
+                  <span style="color: #9ca3af; font-size: 12px;">Status:</span> <span class="badge badge-strong">ACTIF</span>
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <span style="color: #9ca3af; font-size: 12px;">Trades:</span> <span style="color: #e2e8f0; font-weight: bold;">12</span>
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <span style="color: #9ca3af; font-size: 12px;">Win Rate:</span> <span style="color: #10b981; font-weight: bold;">75%</span>
+                </div>
+                <div>
+                  <span style="color: #9ca3af; font-size: 12px;">P&L:</span> <span style="color: #10b981; font-weight: bold;">+$245.50</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h4><i class="fas fa-chart-bar"></i> Agent #2 (Balanced)</h4>
+              <div style="padding: 15px;">
+                <div style="margin-bottom: 10px;">
+                  <span style="color: #9ca3af; font-size: 12px;">Status:</span> <span class="badge badge-strong">ACTIF</span>
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <span style="color: #9ca3af; font-size: 12px;">Trades:</span> <span style="color: #e2e8f0; font-weight: bold;">18</span>
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <span style="color: #9ca3af; font-size: 12px;">Win Rate:</span> <span style="color: #10b981; font-weight: bold;">68%</span>
+                </div>
+                <div>
+                  <span style="color: #9ca3af; font-size: 12px;">P&L:</span> <span style="color: #10b981; font-weight: bold;">+$382.75</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h4><i class="fas fa-chart-bar"></i> Agent #3 (Aggressive)</h4>
+              <div style="padding: 15px;">
+                <div style="margin-bottom: 10px;">
+                  <span style="color: #9ca3af; font-size: 12px;">Status:</span> <span class="badge badge-strong">ACTIF</span>
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <span style="color: #9ca3af; font-size: 12px;">Trades:</span> <span style="color: #e2e8f0; font-weight: bold;">25</span>
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <span style="color: #9ca3af; font-size: 12px;">Win Rate:</span> <span style="color: #10b981; font-weight: bold;">62%</span>
+                </div>
+                <div>
+                  <span style="color: #9ca3af; font-size: 12px;">P&L:</span> <span style="color: #10b981; font-weight: bold;">+$128.30</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: ANALYTICS -->
+      <div id="analytics" class="tab-pane">
+        <div class="tabs-content">
+          <div class="grid-2col">
+            <div class="card grid-full">
+              <h4><i class="fas fa-chart-line"></i> Courbe Profit (24h)</h4>
+              <div class="chart-container">
+                <canvas id="profitChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2col" style="margin-top: 20px;">
+            <div class="card">
+              <h4><i class="fas fa-check-circle"></i> Distribution Win/Loss</h4>
+              <div class="chart-container">
+                <canvas id="winLossChart"></canvas>
+              </div>
+            </div>
+
+            <div class="card">
+              <h4><i class="fas fa-stats"></i> Statistiques Globales</h4>
+              <div style="padding: 15px;">
+                <div style="margin-bottom: 15px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="color: #9ca3af;">Total Trades:</span>
+                    <span style="color: #e2e8f0; font-weight: bold;">55</span>
+                  </div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="color: #9ca3af;">Win Rate Global:</span>
+                    <span style="color: #10b981; font-weight: bold;">68.2%</span>
+                  </div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="color: #9ca3af;">Avg Win:</span>
+                    <span style="color: #10b981; font-weight: bold;">+$85.50</span>
+                  </div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="color: #9ca3af;">Avg Loss:</span>
+                    <span style="color: #ef4444; font-weight: bold;">-$32.20</span>
+                  </div>
+                </div>
+                <div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="color: #9ca3af;">Max Drawdown:</span>
+                    <span style="color: #ef4444; font-weight: bold;">-5.3%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
 <script>
-let balance = 1000;
-let holdings = 0;
-let tradeCount = 0;
-let botRunning = false;
-let initialBalance = 1000;
-let buyPrice = 100;
+// ===== STATE MANAGEMENT =====
+const state = {
+  balance: 1000,
+  holdings: 0,
+  initialBalance: 1000,
+  buyPrice: 45000,
+  trades: [],
+  botRunning: false,
+  tradeCount: 0,
+  winCount: 0,
+  lossCount: 0,
+  agents: [
+    { id: 1, name: 'Agent #1', strategy: 'Conservative', status: 'active', trades: 12, wins: 9, pnl: 245.50, roi: 24.55 },
+    { id: 2, name: 'Agent #2', strategy: 'Balanced', status: 'active', trades: 18, wins: 12, pnl: 382.75, roi: 38.28 },
+    { id: 3, name: 'Agent #3', strategy: 'Aggressive', status: 'active', trades: 25, wins: 15, pnl: 128.30, roi: 12.83 }
+  ],
+  signals: []
+};
 
-function log(msg, type = 'info') {
-  const box = document.getElementById('log');
-  const time = new Date().toLocaleTimeString('fr-FR');
-  const entry = document.createElement('div');
-  entry.className = `log-entry ${type}`;
-  entry.innerText = `[${time}] ${msg}`;
-  box.insertBefore(entry, box.firstChild);
-  
-  // Limite à 50 entrées
-  if (box.children.length > 50) {
-    box.removeChild(box.lastChild);
+// ===== TAB SWITCHING =====
+function switchTab(tabName) {
+  // Hide all tabs
+  document.querySelectorAll('.tab-pane').forEach(pane => {
+    pane.classList.remove('active');
+  });
+
+  // Remove active from all nav tabs
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+
+  // Show selected tab
+  document.getElementById(tabName).classList.add('active');
+  event.target.classList.add('active');
+
+  if (tabName === 'analytics') {
+    setTimeout(() => {
+      initCharts();
+    }, 100);
   }
 }
 
-function updateUI() {
-  document.getElementById('balance').innerText = balance.toFixed(2);
-  document.getElementById('holdings').innerText = holdings;
-  
-  const totalValue = balance + (holdings * buyPrice);
-  document.getElementById('totalValue').innerText = totalValue.toFixed(2);
-  
-  const performance = ((totalValue - initialBalance) / initialBalance * 100).toFixed(2);
-  const perfElement = document.getElementById('performance');
-  perfElement.innerText = (performance >= 0 ? '+' : '') + performance + '%';
-  perfElement.classList.toggle('negative', performance < 0);
-}
-
-function trade(type) {
-  const price = parseFloat(document.getElementById('priceTarget').value) || 100;
-  buyPrice = price;
-
-  if (type === 'BUY') {
-    if (balance >= price) {
-      balance -= price;
-      holdings += 1;
-      tradeCount++;
-      log(`✓ ACHAT exécuté - 1 BTC @ $${price}`, 'success');
-    } else {
-      log(`✗ Solde insuffisant pour l'achat`, 'error');
-    }
-  } else if (type === 'SELL') {
-    if (holdings > 0) {
-      balance += price;
-      holdings -= 1;
-      tradeCount++;
-      log(`✓ VENTE exécutée - 1 BTC @ $${price}`, 'success');
-    } else {
-      log(`✗ Pas de holdings pour la vente`, 'error');
-    }
-  }
-  updateUI();
-  document.getElementById('tradeCount').innerText = tradeCount;
-}
-
+// ===== BOT CONTROL =====
 function startBot() {
-  if (!botRunning) {
-    botRunning = true;
-    document.getElementById('botStatus').innerText = 'Actif';
-    document.getElementById('botStatus').style.color = '#10b981';
-    log('🤖 Bot démarré avec succès', 'success');
+  if (!state.botRunning) {
+    state.botRunning = true;
+    document.getElementById('botStatus').innerHTML = '<span style="color: #10b981;">ACTIF</span>';
+    generateSignals();
     simulateTrading();
   }
 }
 
 function stopBot() {
-  botRunning = false;
-  document.getElementById('botStatus').innerText = 'Arrêté';
-  document.getElementById('botStatus').style.color = '#ef4444';
-  log('🛑 Bot arrêté', 'info');
+  state.botRunning = false;
+  document.getElementById('botStatus').innerHTML = '<span style="color: #ef4444;">ARRÊTÉ</span>';
 }
 
+// ===== TRADING FUNCTIONS =====
+function trade(type) {
+  const price = parseFloat(document.getElementById('priceTarget').value) || 45000;
+  state.buyPrice = price;
+
+  if (type === 'BUY') {
+    if (state.balance >= price) {
+      state.balance -= price;
+      state.holdings += 1;
+      state.tradeCount++;
+      state.winCount++;
+      state.trades.push({
+        type: 'BUY',
+        price: price,
+        timestamp: new Date().toLocaleTimeString('fr-FR'),
+        pnl: 0
+      });
+    }
+  } else if (type === 'SELL') {
+    if (state.holdings > 0) {
+      state.balance += price;
+      state.holdings -= 1;
+      state.tradeCount++;
+      state.trades.push({
+        type: 'SELL',
+        price: price,
+        timestamp: new Date().toLocaleTimeString('fr-FR'),
+        pnl: (price - state.buyPrice)
+      });
+    }
+  }
+
+  updateUI();
+  updatePositions();
+}
+
+// ===== SIGNAL GENERATION =====
+function generateSignals() {
+  const signals = [
+    { time: new Date().toLocaleTimeString('fr-FR'), type: 'BUY', indicator: 'RSI Oversold', signal: 'STRONG BUY', confidence: 85 },
+    { time: new Date(Date.now() - 60000).toLocaleTimeString('fr-FR'), type: 'BUY', indicator: 'MACD Crossover', signal: 'BUY', confidence: 72 },
+    { time: new Date(Date.now() - 120000).toLocaleTimeString('fr-FR'), type: 'SELL', indicator: 'Bollinger Bands', signal: 'HOLD', confidence: 55 }
+  ];
+
+  state.signals = signals;
+  updateSignalsTable();
+}
+
+function updateSignalsTable() {
+  const tbody = document.getElementById('signalsTable');
+  tbody.innerHTML = state.signals.map(signal => `
+    <tr>
+      <td>${signal.time}</td>
+      <td><span class="badge ${signal.type === 'BUY' ? 'badge-buy' : 'badge-sell'}">${signal.type}</span></td>
+      <td>${signal.indicator}</td>
+      <td>${signal.signal}</td>
+      <td>${signal.confidence}%</td>
+      <td><span class="badge badge-signal">ÉMIS</span></td>
+    </tr>
+  `).join('');
+}
+
+// ===== UI UPDATES =====
+function updateUI() {
+  document.getElementById('balance').innerText = `$${state.balance.toFixed(2)}`;
+  document.getElementById('holdings').innerText = state.holdings;
+
+  const totalValue = state.balance + (state.holdings * state.buyPrice);
+  document.getElementById('totalValue').innerText = `$${totalValue.toFixed(2)}`;
+
+  const performance = ((totalValue - state.initialBalance) / state.initialBalance * 100).toFixed(2);
+  const perfElement = document.getElementById('performance');
+  perfElement.innerHTML = `<span style="color: ${performance >= 0 ? '#10b981' : '#ef4444'};">${performance >= 0 ? '+' : ''}${performance}%</span>`;
+
+  document.getElementById('tradeCount').innerText = state.tradeCount;
+
+  const winRate = state.tradeCount > 0 ? ((state.winCount / state.tradeCount) * 100).toFixed(1) : 0;
+  document.getElementById('winRate').innerText = winRate + '%';
+
+  document.getElementById('roi24h').innerText = `${performance >= 0 ? '+' : ''}${performance}%`;
+}
+
+function updatePositions() {
+  const tbody = document.getElementById('positionsTable');
+  if (state.trades.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #9ca3af; padding: 20px;">Aucune position active</td></tr>';
+  } else {
+    tbody.innerHTML = state.trades.filter(t => t.type === 'BUY').map(t => `
+      <tr>
+        <td>BTC/USDT</td>
+        <td>${state.holdings}</td>
+        <td>$${t.price.toFixed(2)}</td>
+        <td style="${state.balance > 0 ? 'color: #10b981;' : 'color: #ef4444;'}">${state.balance > 0 ? '+' : ''}$${(state.balance - state.initialBalance).toFixed(2)}</td>
+      </tr>
+    `).join('');
+  }
+}
+
+// ===== SIMULATION =====
 function simulateTrading() {
-  if (!botRunning) return;
-  
+  if (!state.botRunning) return;
+
   const random = Math.random();
-  
-  if (random > 0.5 && holdings < 5) {
+  if (random > 0.6 && state.holdings < 3) {
     trade('BUY');
-  } else if (random < 0.3 && holdings > 0) {
+  } else if (random < 0.3 && state.holdings > 0) {
     trade('SELL');
   }
-  
-  setTimeout(simulateTrading, 5000 + Math.random() * 5000);
+
+  generateSignals();
+  updateAgentsTable();
+
+  setTimeout(simulateTrading, 8000 + Math.random() * 4000);
 }
 
-// TradingView Widget
-new TradingView.widget({
-  "container_id": "tradingview_widget",
-  "width": "100%",
-  "height": "100%",
-  "symbol": "BINANCE:BTCUSDT",
-  "interval": "5",
-  "timezone": "Etc/UTC",
-  "theme": "dark",
-  "style": "1",
-  "locale": "fr",
-  "toolbar_bg": "#111827",
-  "enable_publishing": false,
-  "allow_symbol_change": true,
-  "details": true,
-  "hotlist": true,
-  "studies": ["MASimple@tv-basicstudies", "RSI@tv-basicstudies"]
+function updateAgentsTable() {
+  const tbody = document.getElementById('agentsTable');
+  tbody.innerHTML = state.agents.map(agent => {
+    const winRate = ((agent.wins / agent.trades) * 100).toFixed(1);
+    return `
+      <tr>
+        <td>${agent.id}</td>
+        <td><span class="badge badge-strong">ACTIF</span></td>
+        <td>${agent.strategy}</td>
+        <td>${agent.trades}</td>
+        <td style="color: #10b981;">${winRate}%</td>
+        <td style="color: ${agent.pnl >= 0 ? '#10b981' : '#ef4444'};">${agent.pnl >= 0 ? '+' : ''}$${agent.pnl.toFixed(2)}</td>
+        <td style="color: ${agent.roi >= 0 ? '#10b981' : '#ef4444'};">${agent.roi >= 0 ? '+' : ''}${agent.roi.toFixed(2)}%</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function changeStrategy() {
+  const strategy = document.getElementById('strategy').value;
+  console.log('Stratégie changée en:', strategy);
+}
+
+// ===== CHARTS =====
+let profitChart, winLossChart;
+
+function initCharts() {
+  if (profitChart) profitChart.destroy();
+  if (winLossChart) winLossChart.destroy();
+
+  // Profit Chart
+  const profitCtx = document.getElementById('profitChart')?.getContext('2d');
+  if (profitCtx) {
+    profitChart = new Chart(profitCtx, {
+      type: 'line',
+      data: {
+        labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+        datasets: [{
+          label: 'Profit Cumulé ($)',
+          data: [0, 45, 120, 85, 245, 320, 385],
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: { color: '#9ca3af' }
+          }
+        },
+        scales: {
+          y: {
+            grid: { color: '#1f2937' },
+            ticks: { color: '#9ca3af' }
+          },
+          x: {
+            grid: { color: '#1f2937' },
+            ticks: { color: '#9ca3af' }
+          }
+        }
+      }
+    });
+  }
+
+  // Win/Loss Chart
+  const winLossCtx = document.getElementById('winLossChart')?.getContext('2d');
+  if (winLossCtx) {
+    winLossChart = new Chart(winLossCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Victoires (68.2%)', 'Défaites (31.8%)'],
+        datasets: [{
+          data: [68.2, 31.8],
+          backgroundColor: ['#10b981', '#ef4444'],
+          borderColor: '#0f172a',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: { color: '#9ca3af' }
+          }
+        }
+      }
+    });
+  }
+}
+
+// ===== TRADINGVIEW WIDGET =====
+function initTradingView() {
+  new TradingView.widget({
+    "container_id": "tradingview_widget",
+    "width": "100%",
+    "height": "100%",
+    "symbol": "BINANCE:BTCUSDT",
+    "interval": "5",
+    "timezone": "Etc/UTC",
+    "theme": "dark",
+    "style": "1",
+    "locale": "fr",
+    "toolbar_bg": "#111827",
+    "enable_publishing": false,
+    "allow_symbol_change": true,
+    "details": true,
+    "hotlist": true
+  });
+}
+
+// ===== INITIALIZATION =====
+window.addEventListener('DOMContentLoaded', () => {
+  initTradingView();
+  updateUI();
+  generateSignals();
+  updateAgentsTable();
 });
-
-updateUI();
-log('✓ Dashboard chargé avec intégration TradingView', 'success');
-log('✓ Simulation Halal Trading Bot prête', 'info');
-
 </script>
-
 </body>
 </html>
