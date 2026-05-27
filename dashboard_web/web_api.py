@@ -340,7 +340,55 @@ def health():
 
 @app.route("/")
 def dashboard():
-    return HTML
+    import json
+    with _lock:
+        prix_json = json.dumps(dict(_prix))
+        signals_json = json.dumps(dict(_signals))
+        positions_json = json.dumps(dict(_positions))
+        trades_json = json.dumps(_trades[:20])
+        logs_json = json.dumps(_logs[:40])
+        status_json = json.dumps({
+            "capital": round(_capital, 2),
+            "rendement": round((_capital - 100) / 100 * 100, 2),
+            "drawdown": round((_cap_max - _capital) / _cap_max * 100 if _cap_max > 0 else 0, 2),
+            "nb_signals": len(_signals),
+            "nb_positions": len(_positions),
+            "nb_trades": len(_trades),
+            "win_rate": round(sum(1 for t in _trades if t.get("pnl",0)>0)/len(_trades)*100,1) if _trades else 0,
+            "trading_ok": True
+        })
+    # Injecter dans le HTML
+    html = HTML.replace(
+        "// INITIAL_DATA_PLACEHOLDER",
+        f"""
+        // Données injectées par le serveur au chargement
+        try {{
+            const _srv_prix = {prix_json};
+            const _srv_signals = {signals_json};
+            const _srv_positions = {positions_json};
+            const _srv_history = {trades_json};
+            const _srv_status = {status_json};
+            const _srv_logs = {logs_json};
+            if(Object.keys(_srv_prix).length > 0) {{
+                state.prix = _srv_prix;
+                state.signals = _srv_signals;
+                state.positions = _srv_positions;
+                state.history_ = _srv_history;
+                state.logs = _srv_logs;
+                state.capital = _srv_status.capital;
+                state.rendement = _srv_status.rendement;
+                state.drawdown = _srv_status.drawdown;
+                state.nbSignals = _srv_status.nb_signals;
+                state.nbPositions = _srv_status.nb_positions;
+                state.nbTrades = _srv_status.nb_trades;
+                state.winRate = _srv_status.win_rate;
+                state.tradingOk = _srv_status.trading_ok;
+                console.log("✅ Données serveur chargées:", Object.keys(_srv_prix).length, "actifs");
+            }}
+        }} catch(e) {{ console.warn("Données serveur non disponibles, mode autonome"); }}
+        """
+    )
+    return html
 
 # ─── Dashboard HTML Pro ────────────────────────────────────────────────────
 HTML = r"""<!DOCTYPE html>
@@ -1103,6 +1151,8 @@ async function tick(){
   await fetchAll();
   renderAll();
 }
+
+// INITIAL_DATA_PLACEHOLDER
 
 // Démarrage
 tick();
