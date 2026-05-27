@@ -30,7 +30,7 @@ DASHBOARD_HTML = """
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>🤖 Trading Bot Halal</title>
-  <meta http-equiv="refresh" content="15">
+  <!-- pas de rafraîchissement automatique -->
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{background:#0a0e1a;color:#e0e6ff;font-family:monospace;padding:16px}
